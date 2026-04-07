@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<title>Hospital Management System</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+/* Small style for the top buttons so AI button matches look */
+
+nav {
+  display:flex;
+  gap:12px;
+  justify-content:center;
+  margin-top:18px;
+}
+
+nav a button {
+  background:#008CBA;
+  color:white;
+  border:none;
+  padding:10px 16px;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:15px;
+}
+
+.overlay {
+  min-height:100vh;
+  padding:40px 20px;
+  box-sizing:border-box;
+}
+
+.about {
+  width:80%;
+  margin:32px auto;
+  background:rgba(255,255,255,0.3);
+  backdrop-filter:blur(6px);
+  border-radius:10px;
+  padding:20px;
+  box-shadow:0 6px 20px rgba(150,222,235,0.4);
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="overlay">
+
+<h1 style="text-align:center; color:#00a1d6; text-shadow:0 2px 6px rgba(0,0,0,0.35);">
+Hospital Management System
+</h1>
+
+<nav>
+
+<a href="pages/doctors.html">
+<button>Doctors</button>
+</a>
+
+<a href="pages/patients.html">
+<button>Patients</button>
+</a>
+
+<a href="pages/departments.html">
+<button>Departments</button>
+</a>
+
+<a href="pages/appointments.html">
+<button>Appointments</button>
+</a>
+
+<!-- AI Assistant -->
+
+<a href="/pages/ai.html" title="Open AI Assistant">
+<button>AI Assistant</button>
+</a>
+
+</nav>
+
+<!-- About Section -->
+
+<div class="about">
+
+<h2 style="text-align:center; color:#004080;">About</h2>
+
+<p style="line-height:1.6; text-align:center;">
+Welcome to the Hospital Management System – a comprehensive platform designed to streamline hospital operations.
+Manage doctors, patients, departments, and appointments efficiently, ensuring smooth administration and improved
+patient care through digital solutions.
+</p>
+
+</div>
+
+</div>
+
+</body>
+</html>

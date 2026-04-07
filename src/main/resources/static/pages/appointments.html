@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Appointments</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background: url('https://images.unsplash.com/photo-1588776814546-2ee061da24d1?auto=format&fit=crop&w=1470&q=80');
+      background-size: cover;
+      color: #333;
+    }
+    h2 {
+      color: #004080;
+      text-align: center;
+      text-shadow: 1px 1px 2px #fff;
+      margin-bottom: 30px;
+    }
+    form {
+      margin-bottom: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    form input, form button, form select {
+      padding: 10px;
+      font-size: 14px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    form button {
+      background-color: #008CBA;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    form button:hover {
+      background-color: #005f75;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: center;
+    }
+    th {
+      background-color: #008CBA;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: rgba(0,0,0,0.03);
+    }
+    button.delete-btn {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button.delete-btn:hover {
+      background-color: #d32f2f;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Appointments</h2>
+
+<!-- FORM WITH DROPDOWNS -->
+<form id="add-appointment-form">
+
+  <!-- PATIENT DROPDOWN -->
+  <select id="appointment-patient-id" required>
+    <option value="">Select Patient</option>
+  </select>
+
+  <!-- DOCTOR DROPDOWN -->
+  <select id="appointment-doctor-id" required>
+    <option value="">Select Doctor</option>
+  </select>
+
+  <input type="date" id="appointment-date" required>
+  <input type="time" id="appointment-time" required>
+  <input type="text" id="appointment-reason" placeholder="Reason" required>
+
+  <button type="submit">Add Appointment</button>
+</form>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Patient</th>
+      <th>Doctor</th>
+      <th>Date</th>
+      <th>Time</th>
+      <th>Reason</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="appointments-table"></tbody>
+</table>
+
+<script>
+const BASE_URL = "http://localhost:8080/api";
+
+let appointmentCounter = 0;
+
+// Load Patients into Dropdown
+function loadPatients() {
+  fetch(`${BASE_URL}/patients`)
+    .then(res => res.json())
+    .then(list => {
+      const dropdown = document.getElementById("appointment-patient-id");
+      dropdown.innerHTML = `<option value="">Select Patient</option>`;
+      list.forEach(p => {
+        dropdown.innerHTML += `<option value="${p.id}">${p.name} (ID: ${p.id})</option>`;
+      });
+    });
+}
+
+// Load Doctors into Dropdown
+function loadDoctors() {
+  fetch(`${BASE_URL}/doctors`)
+    .then(res => res.json())
+    .then(list => {
+      const dropdown = document.getElementById("appointment-doctor-id");
+      dropdown.innerHTML = `<option value="">Select Doctor</option>`;
+      list.forEach(d => {
+        dropdown.innerHTML += `<option value="${d.id}">${d.name} (ID: ${d.id})</option>`;
+      });
+    });
+}
+
+// Load existing appointments
+function loadAppointments() {
+  fetch(`${BASE_URL}/appointments`)
+    .then(res => res.json())
+    .then(appts => {
+      const table = document.getElementById('appointments-table');
+      table.innerHTML = '';
+      appointmentCounter = 0;
+
+      appts.forEach(a => {
+        const appointmentId = a.id;
+        const patientName = a.patient ? a.patient.name : "Unknown";
+        const doctorName = a.doctor ? a.doctor.name : "Unknown";
+
+        appointmentCounter++;
+        const row = document.createElement('tr');
+
+        row.innerHTML = `
+          <td>${appointmentCounter}</td>
+          <td>${patientName}</td>
+          <td>${doctorName}</td>
+          <td>${a.date}</td>
+          <td>${a.time}</td>
+          <td>${a.reason}</td>
+          <td><button class="delete-btn" onclick="deleteAppointment(${appointmentId})">Delete</button></td>
+        `;
+
+        table.appendChild(row);
+      });
+    });
+}
+
+// Add Appointment
+document.getElementById('add-appointment-form').addEventListener('submit', function(e){
+  e.preventDefault();
+
+  const data = {
+    patient: { id: parseInt(document.getElementById('appointment-patient-id').value) },
+    doctor: { id: parseInt(document.getElementById('appointment-doctor-id').value) },
+    date: document.getElementById('appointment-date').value,
+    time: document.getElementById('appointment-time').value,
+    reason: document.getElementById('appointment-reason').value
+  };
+
+  fetch(`${BASE_URL}/appointments`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(data)
+  })
+  .then(() => {
+    this.reset();
+    loadAppointments();
+  });
+});
+
+// Delete appointment
+function deleteAppointment(id) {
+  fetch(`${BASE_URL}/appointments/${id}`, { method: 'DELETE' })
+    .then(() => loadAppointments());
+}
+
+// Load dropdowns & appointments on startup
+loadPatients();
+loadDoctors();
+loadAppointments();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Doctors</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background: url('https://images.unsplash.com/photo-1588776814546-2ee061da24d1?auto=format&fit=crop&w=1470&q=80');
+      background-size: cover;
+      color: #333;
+    }
+    h2 {
+      color: #004080;
+      text-align: center;
+      text-shadow: 1px 1px 2px #fff;
+      margin-bottom: 30px;
+    }
+    form {
+      margin-bottom: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    form input, form button {
+      padding: 10px;
+      font-size: 14px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    form button {
+      background-color: #008CBA;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    form button:hover { background-color: #005f75; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: center;
+    }
+    th { background-color: #008CBA; color: white; }
+    tr:nth-child(even) { background-color: rgba(0,0,0,0.03); }
+    button.delete-btn {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: background 0.3s;
+      border-radius: 5px;
+    }
+    button.delete-btn:hover { background-color: #d32f2f; }
+    img.doctor-photo {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+<h2>Our Doctors</h2>
+
+<form id="add-doctor-form" enctype="multipart/form-data">
+  <input type="text" id="doctor-name" placeholder="Name" required>
+  <input type="text" id="doctor-specialization" placeholder="Specialization" required>
+  <input type="text" id="doctor-phone" placeholder="Phone" required>
+  <input type="email" id="doctor-email" placeholder="Email" required>
+  <input type="file" id="doctor-photo" accept="image/*">
+  <button type="submit">Add Doctor</button>
+</form>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Photo</th>
+      <th>Name</th>
+      <th>Specialization</th>
+      <th>Phone</th>
+      <th>Email</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="doctors-table"></tbody>
+</table>
+
+<script>
+let doctorCounter = 0;
+
+function loadDoctors() {
+  fetch('/api/doctors')
+    .then(res => res.json())
+    .then(doctors => {
+      const table = document.getElementById('doctors-table');
+      table.innerHTML = '';
+      doctorCounter = 0;
+      doctors.forEach(doc => {
+        doctorCounter++;
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${doctorCounter}</td>
+		  <td>${doc.photo ? `<img src="${doc.photo}" alt="${doc.name}" class="doctor-photo">` : ''}</td>
+          <td>${doc.name}</td>
+          <td>${doc.specialization}</td>
+          <td>${doc.phone}</td>
+          <td>${doc.email}</td>
+          <td><button class="delete-btn" onclick="deleteDoctor(${doc.id})">Delete</button></td>
+        `;
+        table.appendChild(row);
+      });
+    });
+}
+
+document.getElementById('add-doctor-form').addEventListener('submit', function(e){
+  e.preventDefault();
+
+  const formData = new FormData();
+  formData.append('name', document.getElementById('doctor-name').value);
+  formData.append('specialization', document.getElementById('doctor-specialization').value);
+  formData.append('phone', document.getElementById('doctor-phone').value);
+  formData.append('email', document.getElementById('doctor-email').value);
+
+  const photoFile = document.getElementById('doctor-photo').files[0];
+  if(photoFile) formData.append('photo', photoFile);
+
+  fetch('/api/doctors', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.json())
+  .then(() => {
+    this.reset();
+    loadDoctors();
+  })
+  .catch(err => console.error(err));
+});
+
+function deleteDoctor(id) {
+  if(confirm('Are you sure you want to delete this doctor?')) {
+    fetch(`/api/doctors/${id}`, { method: 'DELETE' })
+      .then(() => loadDoctors());
+  }
+}
+
+
+loadDoctors();
+</script>
+</body>
+</html>  
