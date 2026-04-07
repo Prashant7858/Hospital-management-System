@@ -1,218 +1,189 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Appointments</title>
+  <meta charset="utf-8" />
+  <title>AI Assistant</title>
+
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
   <style>
     body {
+      margin: 0;
+      padding: 0;
       font-family: Arial, sans-serif;
-      margin: 40px;
-      background: url('https://images.unsplash.com/photo-1588776814546-2ee061da24d1?auto=format&fit=crop&w=1470&q=80');
-      background-size: cover;
-      color: #333;
-    }
-    h2 {
-      color: #004080;
-      text-align: center;
-      text-shadow: 1px 1px 2px #fff;
-      margin-bottom: 30px;
-    }
-    form {
-      margin-bottom: 30px;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(3px);
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
       justify-content: center;
-      background-color: rgba(255, 255, 255, 0.9);
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      align-items: center;
+      min-height: 100vh;
     }
-    form input, form button, form select {
+    .chat-container {
+      width: 40%;
+      min-width: 320px;
+      max-width: 540px;
+      background: #ffffff;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 6px 30px rgba(0, 0, 0, 0.35);
+      animation: fadeIn 220ms ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    h2 { text-align: center; color: #004080; margin: 6px 0 12px; }
+    #messages {
+      height: 40vh;
+      max-height: 420px;
+      overflow-y: auto;
+      border: 1px solid #e6e6e6;
       padding: 10px;
+      border-radius: 8px;
+      background: #fafafa;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .bubble {
+      padding: 10px 14px;
+      border-radius: 12px;
+      max-width: 80%;
+      white-space: pre-wrap;
+      word-break: break-word;
       font-size: 14px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
+      line-height: 1.35;
     }
-    form button {
-      background-color: #008CBA;
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    form button:hover {
-      background-color: #005f75;
-    }
-    table {
+    .user { align-self: flex-end; background: #008CBA; color: #fff; }
+    .bot  { align-self: flex-start; background: #eeeeee; color: #111; }
+    textarea {
       width: 100%;
-      border-collapse: collapse;
-      background-color: rgba(255, 255, 255, 0.95);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      border-radius: 10px;
-      overflow: hidden;
+      height: 82px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      resize: vertical;
+      font-size: 14px;
     }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 12px;
-      text-align: center;
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
     }
-    th {
-      background-color: #008CBA;
-      color: white;
-    }
-    tr:nth-child(even) {
-      background-color: rgba(0,0,0,0.03);
-    }
-    button.delete-btn {
-      background-color: #f44336;
-      color: white;
+    button {
+      padding: 8px 12px;
+      border-radius: 8px;
       border: none;
-      padding: 6px 12px;
       cursor: pointer;
-      border-radius: 5px;
+      font-size: 14px;
     }
-    button.delete-btn:hover {
-      background-color: #d32f2f;
+    #sendBtn { background: #008CBA; color: #fff; }
+    #clearBtn { background: #777; color: #fff; }
+    select {
+      margin-left: auto;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: #fff;
+      font-size: 14px;
+    }
+    @media (max-width: 700px) {
+      .chat-container { width: 92%; min-width: unset; max-width: unset; }
+      #messages { height: 36vh; }
     }
   </style>
 </head>
+
 <body>
 
-<h2>Appointments</h2>
+  <div class="chat-container" role="dialog" aria-modal="true" aria-label="AI assistant">
+    <h2>AI Assistant</h2>
 
-<!-- FORM WITH DROPDOWNS -->
-<form id="add-appointment-form">
+    <div id="messages" aria-live="polite" aria-atomic="false"></div>
 
-  <!-- PATIENT DROPDOWN -->
-  <select id="appointment-patient-id" required>
-    <option value="">Select Patient</option>
-  </select>
+    <textarea id="prompt" placeholder="Type your question here (Ctrl+Enter to send)..."></textarea>
 
-  <!-- DOCTOR DROPDOWN -->
-  <select id="appointment-doctor-id" required>
-    <option value="">Select Doctor</option>
-  </select>
+    <div class="controls">
+      <button id="sendBtn">Ask</button>
+      <button id="clearBtn">Clear</button>
 
-  <input type="date" id="appointment-date" required>
-  <input type="time" id="appointment-time" required>
-  <input type="text" id="appointment-reason" placeholder="Reason" required>
-
-  <button type="submit">Add Appointment</button>
-</form>
-
-<table>
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Patient</th>
-      <th>Doctor</th>
-      <th>Date</th>
-      <th>Time</th>
-      <th>Reason</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody id="appointments-table"></tbody>
-</table>
+      <!-- Only show models you actually have installed -->
+      <select id="modelSelect" title="Model (optional)">
+        <option value="">Default (llama2:latest)</option>
+        <option value="llama2:latest">llama2:latest</option>
+        <option value="gemma3:1b">gemma3:1b</option>
+      </select>
+    </div>
+  </div>
 
 <script>
-const BASE_URL = "http://localhost:8080/api";
+  // Backend endpoint (must match your AiController mapping)
+  const API = "/api/ai/chat";
 
-let appointmentCounter = 0;
+  const messagesEl = document.getElementById("messages");
+  const promptEl = document.getElementById("prompt");
+  const sendBtn = document.getElementById("sendBtn");
+  const clearBtn = document.getElementById("clearBtn");
+  const modelSelect = document.getElementById("modelSelect");
 
-// Load Patients into Dropdown
-function loadPatients() {
-  fetch(`${BASE_URL}/patients`)
-    .then(res => res.json())
-    .then(list => {
-      const dropdown = document.getElementById("appointment-patient-id");
-      dropdown.innerHTML = `<option value="">Select Patient</option>`;
-      list.forEach(p => {
-        dropdown.innerHTML += `<option value="${p.id}">${p.name} (ID: ${p.id})</option>`;
+  function appendBubble(text, cls) {
+    const el = document.createElement("div");
+    el.className = "bubble " + cls;
+    el.textContent = text;
+    messagesEl.appendChild(el);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  async function askAI(){
+    const prompt = promptEl.value.trim();
+    if(!prompt) return;
+    appendBubble(prompt, "user");
+    promptEl.value = "";
+    appendBubble("Thinking...", "bot");
+
+    // payload: ensure model is always present; default to llama2:latest
+    const payload = { prompt: prompt };
+    payload.model = modelSelect.value && modelSelect.value.trim() ? modelSelect.value : "llama2:latest";
+
+    try {
+      const res = await fetch(API, {
+        method: "POST",
+        headers: { "Content-Type":"application/json" },
+        body: JSON.stringify(payload)
       });
-    });
-}
 
-// Load Doctors into Dropdown
-function loadDoctors() {
-  fetch(`${BASE_URL}/doctors`)
-    .then(res => res.json())
-    .then(list => {
-      const dropdown = document.getElementById("appointment-doctor-id");
-      dropdown.innerHTML = `<option value="">Select Doctor</option>`;
-      list.forEach(d => {
-        dropdown.innerHTML += `<option value="${d.id}">${d.name} (ID: ${d.id})</option>`;
-      });
-    });
-}
+      let text = await res.text();
 
-// Load existing appointments
-function loadAppointments() {
-  fetch(`${BASE_URL}/appointments`)
-    .then(res => res.json())
-    .then(appts => {
-      const table = document.getElementById('appointments-table');
-      table.innerHTML = '';
-      appointmentCounter = 0;
+      // remove "Thinking..." bubble
+      const last = messagesEl.lastChild;
+      if(last && last.textContent === "Thinking...") messagesEl.removeChild(last);
 
-      appts.forEach(a => {
-        const appointmentId = a.id;
-        const patientName = a.patient ? a.patient.name : "Unknown";
-        const doctorName = a.doctor ? a.doctor.name : "Unknown";
+      try {
+        const json = JSON.parse(text);
+        // Ollama may return different shapes; try common keys
+        text = json.output || json.text || JSON.stringify(json, null, 2);
+      } catch(e) {
+        // not JSON — keep raw text
+      }
 
-        appointmentCounter++;
-        const row = document.createElement('tr');
+      appendBubble(text, "bot");
+    } catch (err) {
+      const last2 = messagesEl.lastChild;
+      if(last2 && last2.textContent === "Thinking...") messagesEl.removeChild(last2);
+      appendBubble("Error: " + (err.message || err), "bot");
+    }
+  }
 
-        row.innerHTML = `
-          <td>${appointmentCounter}</td>
-          <td>${patientName}</td>
-          <td>${doctorName}</td>
-          <td>${a.date}</td>
-          <td>${a.time}</td>
-          <td>${a.reason}</td>
-          <td><button class="delete-btn" onclick="deleteAppointment(${appointmentId})">Delete</button></td>
-        `;
-
-        table.appendChild(row);
-      });
-    });
-}
-
-// Add Appointment
-document.getElementById('add-appointment-form').addEventListener('submit', function(e){
-  e.preventDefault();
-
-  const data = {
-    patient: { id: parseInt(document.getElementById('appointment-patient-id').value) },
-    doctor: { id: parseInt(document.getElementById('appointment-doctor-id').value) },
-    date: document.getElementById('appointment-date').value,
-    time: document.getElementById('appointment-time').value,
-    reason: document.getElementById('appointment-reason').value
-  };
-
-  fetch(`${BASE_URL}/appointments`, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(data)
-  })
-  .then(() => {
-    this.reset();
-    loadAppointments();
+  sendBtn.addEventListener("click", askAI);
+  clearBtn.addEventListener("click", ()=> messagesEl.innerHTML = "");
+  promptEl.addEventListener("keydown", (e)=> {
+    if(e.key === "Enter" && (e.ctrlKey || e.metaKey)) askAI();
   });
-});
 
-// Delete appointment
-function deleteAppointment(id) {
-  fetch(`${BASE_URL}/appointments/${id}`, { method: 'DELETE' })
-    .then(() => loadAppointments());
-}
-
-// Load dropdowns & appointments on startup
-loadPatients();
-loadDoctors();
-loadAppointments();
+  // focus input when page loads
+  promptEl.focus();
 </script>
 
 </body>

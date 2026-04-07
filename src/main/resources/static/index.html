@@ -1,105 +1,282 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hospital Management System</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
 
 <link rel="stylesheet" href="style.css">
 
+<!-- Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <style>
 
-/* Small style for the top buttons so AI button matches look */
-
-nav {
-  display:flex;
-  gap:12px;
-  justify-content:center;
-  margin-top:18px;
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
 }
 
-nav a button {
-  background:#008CBA;
-  color:white;
-  border:none;
-  padding:10px 16px;
-  border-radius:8px;
-  cursor:pointer;
-  font-size:15px;
+/* HERO */
+.hero {
+  height: 100vh;
+  background: url('https://static.vecteezy.com/system/resources/previews/006/712/985/original/abstract-health-medical-science-healthcare-icon-digital-technology-science-concept-modern-innovation-treatment-medicine-on-hi-tech-future-blue-background-for-wallpaper-template-web-design-vector.jpg') no-repeat center/cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: white;
 }
 
-.overlay {
-  min-height:100vh;
-  padding:40px 20px;
-  box-sizing:border-box;
+/* SECTION */
+section {
+  padding: 80px 20px;
 }
 
+/* 🔥 NEW EXTENDED ABOUT */
 .about {
-  width:80%;
-  margin:32px auto;
-  background:rgba(255,255,255,0.3);
-  backdrop-filter:blur(6px);
-  border-radius:10px;
-  padding:20px;
-  box-shadow:0 6px 20px rgba(150,222,235,0.4);
+  width: 100%;
+  padding: 40px 20px;
+}
+
+.about-box {
+  display: flex;
+  width: 100%;
+  min-height: 180px;
+
+  background: rgba(0, 123, 255, 0.15);
+  backdrop-filter: blur(10px);
+
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+/* LEFT SIDE */
+.about-left {
+  width: 220px;
+  background: rgba(0,0,0,0.4);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* RIGHT SIDE */
+.about-right {
+  flex: 1;
+  padding: 30px;
+}
+
+.about-right h2 {
+  color: #000;
+  margin-bottom: 10px;
+}
+
+.about-right p {
+  color: #000;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+/* FEATURES */
+.feature-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 80px;
+  margin: 100px auto;
+  max-width: 1200px;
+  padding: 40px;
+
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+}
+
+.reverse {
+  flex-direction: row-reverse;
+}
+
+.feature-card img {
+  width: 140px;
+}
+
+.feature-content {
+  max-width: 600px;
+  text-align: left;
+}
+
+.feature-content h3 {
+  font-size: 32px;
+  color: #00bfff;
+  margin-bottom: 15px;
+}
+
+.feature-content p {
+  line-height: 1.8;
+  margin-bottom: 12px;
+  font-size: 16px;
+  color: #fff;
+}
+
+.feature-btn {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 12px 22px;
+  background: linear-gradient(45deg,#008CBA,#00bfff);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: 0.3s;
+}
+
+.feature-btn:hover {
+  background: #005f75;
+}
+
+.ai-section {
+  display: flex;
+  justify-content: center;
+}
+
+.ai-card {
+  flex-direction: column;
+  text-align: center;
+}
+
+/* FOOTER */
+footer {
+  background: #222;
+  color: white;
+  padding: 20px;
 }
 
 </style>
-
 </head>
 
 <body>
 
-<div class="overlay">
+<!-- HERO -->
+<section class="hero">
+  <div>
+    <h1>Hospital Management System</h1>
+    <p>Smart Healthcare, Simplified Management</p>
+  </div>
+</section>
 
-<h1 style="text-align:center; color:#00a1d6; text-shadow:0 2px 6px rgba(0,0,0,0.35);">
-Hospital Management System
-</h1>
+<!-- 🔥 EXTENDED ABOUT -->
+<section id="about" class="about">
 
-<nav>
+  <div class="about-box">
 
-<a href="pages/doctors.html">
-<button>Doctors</button>
-</a>
+    <div class="about-left">
+      About
+    </div>
 
-<a href="pages/patients.html">
-<button>Patients</button>
-</a>
+    <div class="about-right">
+      <h2>About Us</h2>
 
-<a href="pages/departments.html">
-<button>Departments</button>
-</a>
+      <p>
+        The Hospital Management System is a modern digital platform designed to simplify hospital operations.
+        It helps manage doctors, patients, departments, and appointments efficiently.
+      </p>
 
-<a href="pages/appointments.html">
-<button>Appointments</button>
-</a>
+      <p>
+        The system reduces manual work, improves coordination, and ensures quick access to important data.
+        It enhances overall healthcare service quality and patient experience.
+      </p>
 
-<!-- AI Assistant -->
+    </div>
 
-<a href="/pages/ai.html" title="Open AI Assistant">
-<button>AI Assistant</button>
-</a>
+  </div>
 
-</nav>
+</section>
 
-<!-- About Section -->
+<!-- FEATURES -->
+<section class="features">
+  <h2 style="text-align:center; color:white;">Our Features</h2>
 
-<div class="about">
+  <!-- DOCTORS -->
+  <div class="feature-row">
+    <div class="feature-card">
+      <img src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png">
+    </div>
+    <div class="feature-content">
+      <h3>Doctors Management</h3>
+      <p>Manage doctor profiles including specialization and availability.</p>
+      <p>Helps patients find the right doctor quickly.</p>
+      <a href="pages/doctors.html" class="feature-btn">Go to Doctors</a>
+    </div>
+  </div>
 
-<h2 style="text-align:center; color:#004080;">About</h2>
+  <!-- PATIENTS -->
+  <div class="feature-row reverse">
+    <div class="feature-card">
+      <img src="https://cdn-icons-png.flaticon.com/512/1946/1946429.png">
+    </div>
+    <div class="feature-content">
+      <h3>Patients Management</h3>
+      <p>Store and manage patient records securely.</p>
+      <p>Improves healthcare efficiency.</p>
+      <a href="pages/patients.html" class="feature-btn">Go to Patients</a>
+    </div>
+  </div>
 
-<p style="line-height:1.6; text-align:center;">
-Welcome to the Hospital Management System – a comprehensive platform designed to streamline hospital operations.
-Manage doctors, patients, departments, and appointments efficiently, ensuring smooth administration and improved
-patient care through digital solutions.
-</p>
+  <!-- DEPARTMENTS -->
+  <div class="feature-row">
+    <div class="feature-card">
+      <img src="https://cdn-icons-png.flaticon.com/512/3062/3062634.png">
+    </div>
+    <div class="feature-content">
+      <h3>Departments Management</h3>
+      <p>Organize hospital departments efficiently.</p>
+      <p>Ensures structured workflow.</p>
+      <a href="pages/departments.html" class="feature-btn">Go to Departments</a>
+    </div>
+  </div>
 
-</div>
+  <!-- APPOINTMENTS -->
+  <div class="feature-row reverse">
+    <div class="feature-card">
+      <img src="https://cdn-icons-png.flaticon.com/512/747/747310.png">
+    </div>
+    <div class="feature-content">
+      <h3>Appointments Management</h3>
+      <p>Schedule and manage appointments efficiently.</p>
+      <p>Reduces waiting time.</p>
+      <a href="pages/appointments.html" class="feature-btn">Go to Appointments</a>
+    </div>
+  </div>
 
-</div>
+  <!-- AI -->
+  <div class="ai-section">
+    <div class="feature-row ai-card">
+      <div class="feature-card">
+        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png">
+      </div>
+      <div class="feature-content">
+        <h3>AI Assistant</h3>
+        <p>Get instant help using AI.</p>
+        <p>Improves user experience.</p>
+        <a href="pages/ai.html" class="feature-btn">Open AI</a>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 Hospital Management System | Designed by You 😎</p>
+</footer>
 
 </body>
 </html>

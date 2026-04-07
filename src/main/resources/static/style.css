@@ -1,13 +1,12 @@
 /* General body & background */
 
 body {
-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-margin: 0;
-padding: 0;
-background: url('https://as2.ftcdn.net/v2/jpg/11/71/60/93/1000_F_1171609329_dvgsRzRjUZY7yERVjRo7ELkQxEzuSSB3.jpg')
-no-repeat center center fixed;
-background-size: cover;
-color: #fff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: url('https://static.vecteezy.com/system/resources/previews/006/712/985/original/abstract-health-medical-science-healthcare-icon-digital-technology-science-concept-modern-innovation-treatment-medicine-on-hi-tech-future-blue-background-for-wallpaper-template-web-design-vector.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: #fff;
 }
 
 /* Overlay */
@@ -106,4 +105,22 @@ padding: 10px 20px;
 font-size: 1em;
 }
 
+}
+/* FEATURE BUTTON (inside cards) */
+.feature-btn {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 10px 18px;
+  background: linear-gradient(45deg, #008CBA, #00bfff);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.feature-btn:hover {
+  background: linear-gradient(45deg, #005f75, #008CBA);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 191, 255, 0.5);
 }
