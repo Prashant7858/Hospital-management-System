@@ -1,190 +1,103 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>AI Assistant</title>
-
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      background: rgba(0, 0, 0, 0.45);
-      backdrop-filter: blur(3px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
-    .chat-container {
-      width: 40%;
-      min-width: 320px;
-      max-width: 540px;
-      background: #ffffff;
-      padding: 16px;
-      border-radius: 12px;
-      box-shadow: 0 6px 30px rgba(0, 0, 0, 0.35);
-      animation: fadeIn 220ms ease-in-out;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.96); }
-      to   { opacity: 1; transform: scale(1); }
-    }
-    h2 { text-align: center; color: #004080; margin: 6px 0 12px; }
-    #messages {
-      height: 40vh;
-      max-height: 420px;
-      overflow-y: auto;
-      border: 1px solid #e6e6e6;
-      padding: 10px;
-      border-radius: 8px;
-      background: #fafafa;
-      margin-bottom: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .bubble {
-      padding: 10px 14px;
-      border-radius: 12px;
-      max-width: 80%;
-      white-space: pre-wrap;
-      word-break: break-word;
-      font-size: 14px;
-      line-height: 1.35;
-    }
-    .user { align-self: flex-end; background: #008CBA; color: #fff; }
-    .bot  { align-self: flex-start; background: #eeeeee; color: #111; }
-    textarea {
-      width: 100%;
-      height: 82px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      padding: 10px;
-      resize: vertical;
-      font-size: 14px;
-    }
-    .controls {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 10px;
-    }
-    button {
-      padding: 8px 12px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    #sendBtn { background: #008CBA; color: #fff; }
-    #clearBtn { background: #777; color: #fff; }
-    select {
-      margin-left: auto;
-      padding: 6px 8px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      background: #fff;
-      font-size: 14px;
-    }
-    @media (max-width: 700px) {
-      .chat-container { width: 92%; min-width: unset; max-width: unset; }
-      #messages { height: 36vh; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Diabetes Prediction</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; padding: 50px; background-color: #f4f7f6; }
+        .ai-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; width: 350px; }
+        .ai-card h3 { color: #333; margin-bottom: 20px; }
+        .ai-form input {
+            display: block;
+            width: 100%;
+            margin: 15px 0;
+            padding: 12px;
+            border: 2px solid #eee; /* Visible border */
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .ai-form input:focus { border-color: #00bfff; outline: none; }
+        .ai-form button {
+            width: 100%;
+            padding: 15px;
+            background: #00bfff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .ai-form button:hover { background: #008CBA; }
+        #result { margin-top: 25px; padding: 15px; border-radius: 8px; font-weight: bold; min-height: 24px; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e9; color: #2e7d32; }
+    </style>
 </head>
-
 <body>
 
-  <div class="chat-container" role="dialog" aria-modal="true" aria-label="AI assistant">
-    <h2>AI Assistant</h2>
+<div class="ai-card">
+    <h3>Diabetes Prediction</h3>
+    <div class="ai-form">
+        <input type="number" id="age" placeholder="Age" required>
+        <input type="number" id="bmi" placeholder="BMI (e.g. 25.5)" step="0.1" required>
+        <input type="number" id="glucose" placeholder="Glucose Level" required>
+        <input type="number" id="hba1c" placeholder="HbA1c Level" step="0.1" required>
 
-    <div id="messages" aria-live="polite" aria-atomic="false"></div>
-
-    <textarea id="prompt" placeholder="Type your question here (Ctrl+Enter to send)..."></textarea>
-
-    <div class="controls">
-      <button id="sendBtn">Ask</button>
-      <button id="clearBtn">Clear</button>
-
-      <!-- Only show models you actually have installed -->
-      <select id="modelSelect" title="Model (optional)">
-        <option value="">Default (llama2:latest)</option>
-        <option value="llama2:latest">llama2:latest</option>
-        <option value="gemma3:1b">gemma3:1b</option>
-      </select>
+        <button type="button" onclick="predict()">Predict Now</button>
+        <div id="result"></div>
     </div>
-  </div>
+</div>
 
 <script>
-  // Backend endpoint (must match your AiController mapping)
-  const API = "/api/ai/chat";
+async function predict() {
+    const resDiv = document.getElementById("result");
+    const inputs = {
+        age: document.getElementById("age").value,
+        bmi: document.getElementById("bmi").value,
+        glucose: document.getElementById("glucose").value,
+        hba1c: document.getElementById("hba1c").value
+    };
 
-  const messagesEl = document.getElementById("messages");
-  const promptEl = document.getElementById("prompt");
-  const sendBtn = document.getElementById("sendBtn");
-  const clearBtn = document.getElementById("clearBtn");
-  const modelSelect = document.getElementById("modelSelect");
+    if (Object.values(inputs).some(v => !v)) {
+        resDiv.className = "error";
+        resDiv.innerText = "⚠️ Please fill all fields";
+        return;
+    }
 
-  function appendBubble(text, cls) {
-    const el = document.createElement("div");
-    el.className = "bubble " + cls;
-    el.textContent = text;
-    messagesEl.appendChild(el);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-  }
-
-  async function askAI(){
-    const prompt = promptEl.value.trim();
-    if(!prompt) return;
-    appendBubble(prompt, "user");
-    promptEl.value = "";
-    appendBubble("Thinking...", "bot");
-
-    // payload: ensure model is always present; default to llama2:latest
-    const payload = { prompt: prompt };
-    payload.model = modelSelect.value && modelSelect.value.trim() ? modelSelect.value : "llama2:latest";
+    resDiv.className = "";
+    resDiv.innerText = "⏳ Processing...";
 
     try {
-      const res = await fetch(API, {
-        method: "POST",
-        headers: { "Content-Type":"application/json" },
-        body: JSON.stringify(payload)
-      });
+        const response = await fetch("http://localhost:8080/api/predict-diabetes", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                features: [
+                    parseFloat(inputs.age),
+                    parseFloat(inputs.bmi),
+                    parseFloat(inputs.glucose),
+                    parseFloat(inputs.hba1c)
+                ]
+            })
+        });
 
-      let text = await res.text();
-
-      // remove "Thinking..." bubble
-      const last = messagesEl.lastChild;
-      if(last && last.textContent === "Thinking...") messagesEl.removeChild(last);
-
-      try {
-        const json = JSON.parse(text);
-        // Ollama may return different shapes; try common keys
-        text = json.output || json.text || JSON.stringify(json, null, 2);
-      } catch(e) {
-        // not JSON — keep raw text
-      }
-
-      appendBubble(text, "bot");
-    } catch (err) {
-      const last2 = messagesEl.lastChild;
-      if(last2 && last2.textContent === "Thinking...") messagesEl.removeChild(last2);
-      appendBubble("Error: " + (err.message || err), "bot");
+        const data = await response.json();
+        
+        if (response.ok) {
+            resDiv.className = data.prediction === 1 ? "error" : "success";
+            resDiv.innerText = data.message || (data.prediction === 1 ? "High Risk" : "Low Risk");
+        } else {
+            throw new Error(data.error || "Server error");
+        }
+    } catch (error) {
+        resDiv.className = "error";
+        resDiv.innerText = "❌ Error: " + error.message;
+        console.error("Fetch error:", error);
     }
-  }
-
-  sendBtn.addEventListener("click", askAI);
-  clearBtn.addEventListener("click", ()=> messagesEl.innerHTML = "");
-  promptEl.addEventListener("keydown", (e)=> {
-    if(e.key === "Enter" && (e.ctrlKey || e.metaKey)) askAI();
-  });
-
-  // focus input when page loads
-  promptEl.focus();
+}
 </script>
-
 </body>
 </html>
