@@ -30,6 +30,8 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           source: "target/*.jar"
           target: "/home/ubuntu"
+          # IMPORTANT: This prevents the 'target' folder from being created on EC2
+          strip_components: 1 
 
       - name: Deploy on EC2
         uses: appleboy/ssh-action@v1.0.3
@@ -38,5 +40,14 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            pkill -f 'java -jar' || true
-            nohup java -jar /home/ubuntu/*.jar > app.log 2>&1 &
+            # 1. Kill the old app gracefully
+            sudo pkill -f 'java -jar' || true
+            
+            # 2. Go to the home directory
+            cd /home/ubuntu
+            
+            # 3. Start the app and fully detach it from the GitHub session
+            # We use 'disown' so GitHub can exit successfully while the app keeps running
+            nohup java -jar *.jar > app.log 2>&1 & 
+            sleep 5
+            disown
