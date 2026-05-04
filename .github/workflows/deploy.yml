@@ -1,9 +1,9 @@
-name: Deploy to EC2
+name: Deploy Hospital Management System
 
 on:
   push:
     branches:
-      - main
+      - main  # This ensures the script runs every time you push to the main branch
 
 jobs:
   deploy:
@@ -13,13 +13,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Java
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: maven
 
-      - name: Build project
+      - name: Build project with Maven
         run: mvn clean package -DskipTests
 
       - name: Copy JAR to EC2
@@ -30,8 +31,8 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           source: "target/*.jar"
           target: "/home/ubuntu"
-          # IMPORTANT: This prevents the 'target' folder from being created on EC2
-          strip_components: 1 
+          # This removes the 'target/' folder so the JAR lands directly in /home/ubuntu
+          strip_components: 1
 
       - name: Deploy on EC2
         uses: appleboy/ssh-action@v1.0.3
@@ -40,14 +41,19 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            # 1. Kill the old app gracefully
+            # 1. Kill any existing Java processes (stops the old version)
             sudo pkill -f 'java -jar' || true
             
             # 2. Go to the home directory
             cd /home/ubuntu
             
-            # 3. Start the app and fully detach it from the GitHub session
-            # We use 'disown' so GitHub can exit successfully while the app keeps running
-            nohup java -jar *.jar > app.log 2>&1 & 
+            # 3. Remove old log file to start fresh
+            rm -f app.log
+            
+            # 4. Start the app in the background
+            # We use *.jar because strip_components moved it to this folder
+            nohup java -jar *.jar > app.log 2>&1 &
+            
+            # 5. Give the app 5 seconds to start, then detach it from the SSH session
             sleep 5
             disown
